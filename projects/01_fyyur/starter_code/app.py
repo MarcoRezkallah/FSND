@@ -62,8 +62,17 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
+class Show(db.Model):
+    __tablename__ = 'Show'
+
+    artist_id = db.Column(db.Integer, db.ForeignKey(
+        'Artist.id'), primary_key=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey(
+        'Venue.id'), primary_key=True)
+    start_time = db.Column(db.DateTime(timezone=True))
+    artist = db.relationship('Artist', backref='shows')
+    venue = db.relationship('Venue', backref='shows')
 
 #----------------------------------------------------------------------------#
 # Filters.
