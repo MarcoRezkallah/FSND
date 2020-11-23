@@ -41,7 +41,7 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    genre = db.Column(db.String(120))
+    genres = db.Column(db.String(120))
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
@@ -105,29 +105,56 @@ def index():
 
 @app.route('/venues')
 def venues():
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = [{
-        "city": "San Francisco",
-        "state": "CA",
-        "venues": [{
-            "id": 1,
-            "name": "The Musical Hop",
-            "num_upcoming_shows": 0,
-        }, {
-            "id": 3,
-            "name": "Park Square Live Music & Coffee",
-            "num_upcoming_shows": 1,
-        }]
-    }, {
-        "city": "New York",
-        "state": "NY",
-        "venues": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
-    }]
+    venueList = Venue.query.all()
+    output = {}
+    data = []
+    for vn in venueList:
+        v = {}
+        v['id'] = vn.id
+        v['name'] = vn.name
+        v['num_upcoming_shows'] = 0  # TODO: handle calculations
+
+        try:
+            output[vn.state][vn.city].append(v)
+        except:
+            try:
+                output[vn.state][vn.city] = []
+            except:
+                output[vn.state] = {}
+                output[vn.state][vn.city] = []
+            output[vn.state][vn.city] = []
+            output[vn.state][vn.city].append(v)
+
+    for state, value in output.items():
+        for city, venues in value.items():
+            obj = {}
+            obj['city'] = city
+            obj['state'] = state
+            obj['venues'] = venues
+            data.append(obj)
+
+            
+    # data = [{
+    #     "city": "San Francisco",
+    #     "state": "CA",
+    #     "venues": [{
+    #         "id": 1,
+    #         "name": "The Musical Hop",
+    #         "num_upcoming_shows": 0,
+    #     }, {
+    #         "id": 3,
+    #         "name": "Park Square Live Music & Coffee",
+    #         "num_upcoming_shows": 1,
+    #     }]
+    # }, {
+    #     "city": "New York",
+    #     "state": "NY",
+    #     "venues": [{
+    #         "id": 2,
+    #         "name": "The Dueling Pianos Bar",
+    #         "num_upcoming_shows": 0,
+    #     }]
+    # }]
     return render_template('pages/venues.html', areas=data)
 
 
@@ -244,14 +271,30 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-    # TODO: insert form data as a new Venue record in the db, instead
-    # TODO: modify data to be the data object returned from db insertion
+    
+    f = request.form
+    v = Venue()
 
-    # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    v.name = f['name']
+    v.city = f['city']
+    v.state = f['state']
+    v.address = f['address']
+    v.phone = f['phone']
+    v.image_link = f['image_link']
+    v.facebook_link = f['facebook_link']
+    v.genres = f.getlist('genres')
+    v.website = f['website']
+    # v.seeking_talent = f['seeking_talent']
+    # v.seeking_description = f['seeking_description']
+    try:    
+        db.session.add(v)
+        db.session.commit()
+        flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    except:
+        flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+        db.session.rollback()
+    finally:
+        db.session.close()
     return render_template('pages/home.html')
 
 
