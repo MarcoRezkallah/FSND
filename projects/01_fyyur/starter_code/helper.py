@@ -73,7 +73,7 @@ class helper:
             "phone": artist.phone,
             "website": artist.website,
             "facebook_link": artist.facebook_link,
-            "seeking_talent": artist.seeking_venue or False,
+            "seeking_venue": artist.seeking_venue or False,
             "image_link": artist.image_link,
             "past_shows": [{
                 "artist_id": 5,
