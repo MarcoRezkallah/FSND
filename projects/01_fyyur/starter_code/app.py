@@ -15,6 +15,12 @@ from forms import *
 from flask_migrate import Migrate
 
 #----------------------------------------------------------------------------#
+# Marco's Imports
+#----------------------------------------------------------------------------#
+
+from helper import helper
+
+#----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
 
@@ -106,55 +112,7 @@ def index():
 @app.route('/venues')
 def venues():
     venueList = Venue.query.all()
-    output = {}
-    data = []
-    for vn in venueList:
-        v = {}
-        v['id'] = vn.id
-        v['name'] = vn.name
-        v['num_upcoming_shows'] = 0  # TODO: handle calculations
-
-        try:
-            output[vn.state][vn.city].append(v)
-        except:
-            try:
-                output[vn.state][vn.city] = []
-            except:
-                output[vn.state] = {}
-                output[vn.state][vn.city] = []
-            output[vn.state][vn.city] = []
-            output[vn.state][vn.city].append(v)
-
-    for state, value in output.items():
-        for city, venues in value.items():
-            obj = {}
-            obj['city'] = city
-            obj['state'] = state
-            obj['venues'] = venues
-            data.append(obj)
-
-            
-    # data = [{
-    #     "city": "San Francisco",
-    #     "state": "CA",
-    #     "venues": [{
-    #         "id": 1,
-    #         "name": "The Musical Hop",
-    #         "num_upcoming_shows": 0,
-    #     }, {
-    #         "id": 3,
-    #         "name": "Park Square Live Music & Coffee",
-    #         "num_upcoming_shows": 1,
-    #     }]
-    # }, {
-    #     "city": "New York",
-    #     "state": "NY",
-    #     "venues": [{
-    #         "id": 2,
-    #         "name": "The Dueling Pianos Bar",
-    #         "num_upcoming_shows": 0,
-    #     }]
-    # }]
+    data = helper.map_venues(venueList)
     return render_template('pages/venues.html', areas=data)
 
 
@@ -271,7 +229,7 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-    
+
     f = request.form
     v = Venue()
 
@@ -286,12 +244,13 @@ def create_venue_submission():
     v.website = f['website']
     # v.seeking_talent = f['seeking_talent']
     # v.seeking_description = f['seeking_description']
-    try:    
+    try:
         db.session.add(v)
         db.session.commit()
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
     except:
-        flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+        flash('An error occurred. Venue ' +
+              data.name + ' could not be listed.')
         db.session.rollback()
     finally:
         db.session.close()
