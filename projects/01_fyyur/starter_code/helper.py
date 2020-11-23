@@ -1,6 +1,5 @@
 import json
 
-
 class helper:
     def map_venues(venueList):
         output = {}
@@ -92,3 +91,16 @@ class helper:
             "upcoming_shows_count": 1,
         }
         return out
+
+    def map_shows(showList):
+        data = []
+        for s in showList:
+            data.append({
+                "venue_id": s.venue.id,
+                "venue_name": s.venue.name,
+                "artist_id": s.artist.id,
+                "artist_name": s.artist.name,
+                "artist_image_link": s.artist.image_link,
+                "start_time": s.start_time.isoformat()
+            })
+        return data
