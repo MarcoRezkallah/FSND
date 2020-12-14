@@ -29,22 +29,22 @@ def create_app(test_config=None):
         return jsonify([cat.format() for cat in cats])
 
     @app.route('/questions')
-    def GET_questionss():
+    def GET_questions():
         clientpage = request.args.get('page', type=int, default=1)
         if clientpage < 1:
             abort(404)
         page = clientpage - 1
         limit = request.args.get('limit', type=int, default=10)
-        
+
         if limit < 1:
             abort(416)
-        
+
         count = Question.query.count()
 
         offset = page * limit
         if offset > count:
-              abort(416)
-              
+            abort(416)
+
         questionsQuery = Question.query.limit(limit).offset(offset).all()
         questions = [question.format() for question in questionsQuery]
 
@@ -59,10 +59,16 @@ def create_app(test_config=None):
 
         return jsonify(result)
 
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    def DELETE_questions(question_id):
+        try:
+            result = Question.filterBy(id=question_id).delete()
+        except:
+            abort(500)
+
+        return result
 
     '''
-
-
     @TODO: 
     Create an endpoint to DELETE question using a question ID. 
 
