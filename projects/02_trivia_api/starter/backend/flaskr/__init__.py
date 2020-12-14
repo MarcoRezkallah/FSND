@@ -25,8 +25,13 @@ def create_app(test_config=None):
 
     @app.route('/categories')
     def GET_categorys():
-        cats = Category.query.all()
-        return jsonify([cat.format() for cat in cats])
+        categoriesQuery = Category.query.all()
+        categories = [categorie.format() for categorie in categoriesQuery]
+        categoriesDict = {}
+        for cat in categories:
+            categoriesDict[cat['id']] = cat['type']
+
+        return jsonify(categoriesDict)
 
     @app.route('/questions')
     def GET_questions():
@@ -73,16 +78,19 @@ def create_app(test_config=None):
             abort(500)
         return jsonify(result)
 
-    '''
-    @TODO: 
-    Create an endpoint to POST a new question, 
-    which will require the question and answer text, 
-    category, and difficulty score.
+    @app.route('/questions', methods=['POST'])
+    def POST_questions():
+        data = request.get_json()
 
-    TEST: When you submit a question on the "Add" tab, 
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.  
-    '''
+        try:
+            q = Question(data['question'],data['answer'],data['category'],data['difficulty'])    
+            q.insert()
+        except Exception as e:
+            abort(500)
+        return jsonify(q.format())
+
+        # @NOTE: I didn't test this because of buggy frontend
+
 
     '''
     @TODO: 
