@@ -50,11 +50,14 @@ def create_app(test_config=None):
 
         categoriesQuery = Category.query.all()
         categories = [categorie.format() for categorie in categoriesQuery]
+        categoriesDict = {}
+        for cat in categories:
+            categoriesDict[cat['id']] = cat['type']
 
         result = {
             "questions": questions,
             "total_questions": count,
-            "categories": categories,
+            "categories": categoriesDict,
         }
 
         return jsonify(result)
