@@ -10,25 +10,26 @@ QUESTIONS_PER_PAGE = 10
 
 
 def create_app(test_config=None):
-  # create and configure the app
-  app = Flask(__name__)
-  setup_db(app)
-  CORS(app)
+    # create and configure the app
+    app = Flask(__name__)
+    setup_db(app)
+    CORS(app)
 
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type, Authorization')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET, POST, PUT, PATCH, Delete, OPTIONS')
+        return response
 
-  @app.after_request()
-  def after_request(response):
-    response.headers.add('Access-Control-Allow-Headers','Content-Type, Authorization')
-    response.headers.add('Access-Control-Allow-Methods','GET, POST, PUT, PATCH, Delete, OPTIONS')
+    @app.route('/categories')
+    def GET_categorys():
+        cats = Category.query.all()
+        return jsonify([cat.format() for cat in cats])
 
+    return app
 
-  @app.route('/categories')
-  def GET_categorys():
-    cat = Category.findAll()
-    print(cat)
-    return cat
-
-  return app
 
 '''
 @TODO: 
