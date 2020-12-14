@@ -1,4 +1,6 @@
 import json
+from datetime import datetime, timezone
+
 
 class helper:
     def map_venues(venueList):
@@ -8,8 +10,10 @@ class helper:
             v = {}
             v['id'] = vn.id
             v['name'] = vn.name
-            v['num_upcoming_shows'] = 0  # TODO: handle calculations
-
+            v['num_upcoming_shows'] = 0
+            for show in vn.shows:
+                if show.start_time.replace(tzinfo=timezone.utc) > datetime.now().replace(tzinfo=timezone.utc):
+                    v['num_upcoming_shows'] = v['num_upcoming_shows'] + 1
             try:
                 output[vn.state][vn.city].append(v)
             except:

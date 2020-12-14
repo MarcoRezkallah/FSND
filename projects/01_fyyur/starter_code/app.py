@@ -71,11 +71,11 @@ class Artist(db.Model):
 
 class Show(db.Model):
     __tablename__ = 'Show'
-
+    id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey(
-        'Artist.id'), primary_key=True)
+        'Artist.id'))
     venue_id = db.Column(db.Integer, db.ForeignKey(
-        'Venue.id'), primary_key=True)
+        'Venue.id'))
     start_time = db.Column(db.DateTime(timezone=True))
     artist = db.relationship('Artist', backref='shows')
     venue = db.relationship('Venue', backref='shows')
