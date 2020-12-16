@@ -139,11 +139,5 @@ def create_app(test_config=None):
         return jsonify({
             "question": question
         })
-
-
-    '''
-    @TODO: 
-    Create error handlers for all expected errors 
-    including 404 and 422. 
-    '''
+    
     return app
