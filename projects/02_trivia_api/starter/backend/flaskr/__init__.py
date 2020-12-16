@@ -83,25 +83,29 @@ def create_app(test_config=None):
         data = request.get_json()
 
         try:
-            q = Question(data['question'],data['answer'],data['category'],data['difficulty'])    
+            q = Question(data['question'], data['answer'],
+                         data['category'], data['difficulty'])
             q.insert()
         except Exception as e:
             abort(500)
         return jsonify(q.format())
 
-        # @NOTE: I didn't test this because of buggy frontend
+    @app.route('/questions/search', methods=['POST'])
+    def SEARCH_questions():
+        data = request.get_json()
 
+        count = Question.query.count()
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
+        questionsQuery = Question.query.filter(
+            Question.question.ilike('%{}%'.format(data['searchTerm']))).all()
+        questions = [question.format() for question in questionsQuery]
 
-    TEST: Search by any phrase. The questions list will update to include 
-    only question that include that string within their question. 
-    Try using the word "title" to start. 
-    '''
+        result = {
+            "questions": questions,
+            "total_questions": count,
+        }
+
+        return jsonify(result)
 
     '''
     @TODO: 
