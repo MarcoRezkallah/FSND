@@ -107,14 +107,18 @@ def create_app(test_config=None):
 
         return jsonify(result)
 
-    '''
-    @TODO: 
-    Create a GET endpoint to get questions based on category. 
-
-    TEST: In the "List" tab / main screen, clicking on one of the 
-    categories in the left column will cause only questions of that 
-    category to be shown. 
-    '''
+    @app.route('/categories/<int:category_id>/questions')
+    def GET_category_questions(category_id):
+        count = Question.query.count()
+        questionsQuery = Question.query.filter_by(
+            category='{}'.format(category_id)).all()
+        print(questionsQuery)
+        questions = [question.format() for question in questionsQuery]
+        result = {
+            "questions": questions,
+            "total_questions": count,
+        }
+        return jsonify(result)
 
     '''
     @TODO: 
